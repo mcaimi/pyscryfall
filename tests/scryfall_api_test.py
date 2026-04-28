@@ -1,5 +1,5 @@
-from scryfall.api import search_card_by_id, search_cards_by_name
-from scryfall.schemas import ScryfallCard, ScryfallCardList
+from pyscryfall.api import search_card_by_id, search_cards_by_name
+from pyscryfall.schemas import ScryfallCard, ScryfallCardList
 
 
 # test search card by name
