@@ -1,0 +1,21 @@
+[project]
+name = "pyscryfall"
+version = "0.1.0"
+description = "Python library to search Magic The Gathering cards information on scryfall.com"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "requests>=2.33.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8,<9",
+]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
