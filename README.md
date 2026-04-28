@@ -216,3 +216,8 @@ uv run pytest -v
 ## References
 
 - [Scryfall API documentation](https://scryfall.com/docs/api)
+
+## AI Disclosure
+
+Part of this project has been developed with the help of an AI Model. Specifically I used a locally-hosted [QWEN3-CODER](https://ollama.com/library/qwen3-coder) using [Ollama](https://ollama.ai).
+
