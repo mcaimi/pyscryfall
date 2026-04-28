@@ -18,12 +18,20 @@ To install only production dependencies in another workflow, use your tool’s e
 
 ## Package layout
 
-The installable package is the `scryfall` directory. Modules split **HTTP entry points**, **typed JSON models**, **errors**, and **internal parsing helpers**.
+The library lives under **`src/pyscryfall/`** on disk. After `uv sync` or `pip install`, you import it as **`pyscryfall`**. Modules split **HTTP entry points**, **typed JSON models**, **errors**, and **internal parsing helpers**.
+
+Repository layout (high level):
+
+```
+src/pyscryfall/    # installable package (api, schemas, exceptions, helpers, __init__)
+tests/
+pyproject.toml
+```
 
 ```mermaid
 flowchart LR
     subgraph public [Public surface]
-        init["scryfall / __init__.py"]
+        init["pyscryfall/__init__.py"]
     end
     subgraph impl [Implementation]
         api["api.py"]
@@ -41,12 +49,12 @@ flowchart LR
 
 | Module | Role |
 |--------|------|
-| **`scryfall.api`** | `GET` requests to Scryfall, JSON parsing, validation of `object` field, construction of `ScryfallCard` / `ScryfallCardList`. |
-| **`scryfall.schemas`** | Dataclasses mirroring Scryfall card and list JSON; `from_dict` / `to_dict` (and list `loads` / `dumps`). |
-| **`scryfall.exceptions`** | `ScryfallApiError` for HTTP failures and API error payloads; `ScryfallErrorBody` for structured error fields. |
-| **`scryfall.helpers`** | Internal helpers (`_optional_model`, `_list_of`, …) used by `schemas`; not part of the public `__all__`. |
+| **`pyscryfall.api`** | `GET` requests to Scryfall, JSON parsing, validation of `object` field, construction of `ScryfallCard` / `ScryfallCardList`. |
+| **`pyscryfall.schemas`** | Dataclasses mirroring Scryfall card and list JSON; `from_dict` / `to_dict` (and list `loads` / `dumps`). |
+| **`pyscryfall.exceptions`** | `ScryfallApiError` for HTTP failures and API error payloads; `ScryfallErrorBody` for structured error fields. |
+| **`pyscryfall.helpers`** | Internal helpers (`_optional_model`, `_list_of`, …) used by `schemas`; not part of the public `__all__`. |
 
-The package root re-exports the search functions, core card types, and exceptions (see `scryfall/__init__.py` `__all__`).
+The package root re-exports the search functions, core card types, and exceptions (see `src/pyscryfall/__init__.py` `__all__`).
 
 ## API and data flow
 
@@ -55,7 +63,7 @@ High-level flow from your code to typed objects:
 ```mermaid
 sequenceDiagram
     participant App as YourCode
-    participant API as scryfall.api
+    participant API as pyscryfall.api
     participant HTTP as ScryfallHTTPServer
     participant Sch as schemas
 
@@ -131,7 +139,7 @@ Errors from the library use **`ScryfallApiError`**: message, optional **`http_st
 ### Search by name (all prints on the first page)
 
 ```python
-from scryfall import search_cards_by_name, ScryfallCardList
+from pyscryfall import search_cards_by_name, ScryfallCardList
 
 result: ScryfallCardList = search_cards_by_name("Lightning Bolt")
 print(result.total_cards, result.has_more)
@@ -144,7 +152,7 @@ Optional arguments match Scryfall’s search API (see docstrings): e.g. `unique=
 ### Fetch a single card by Scryfall ID
 
 ```python
-from scryfall import search_card_by_id, ScryfallCard
+from pyscryfall import search_card_by_id, ScryfallCard
 
 card: ScryfallCard = search_card_by_id("de652420-eacf-4f9d-9f13-c6bc02b0fa72")
 print(card.name, card.type_line, card.oracle_text)
@@ -153,7 +161,7 @@ print(card.name, card.type_line, card.oracle_text)
 ### Handle API and HTTP errors
 
 ```python
-from scryfall import search_card_by_id, ScryfallApiError
+from pyscryfall import search_card_by_id, ScryfallApiError
 
 try:
     search_card_by_id("00000000-0000-0000-0000-000000000000")
@@ -168,7 +176,7 @@ except ScryfallApiError as exc:
 
 ```python
 import requests
-from scryfall import search_cards_by_name
+from pyscryfall import search_cards_by_name
 
 session = requests.Session()
 session.headers["User-Agent"] = "MyApp/1.0"
@@ -178,7 +186,7 @@ cards = search_cards_by_name("Island", session=session, timeout=60.0)
 ### Serialize models
 
 ```python
-from scryfall import search_card_by_id
+from pyscryfall import search_card_by_id
 
 card = search_card_by_id("de652420-eacf-4f9d-9f13-c6bc02b0fa72")
 payload = card.to_dict()
@@ -203,7 +211,7 @@ Verbose output:
 uv run pytest -v
 ```
 
-Pytest is configured in `pyproject.toml` (`testpaths`, `pythonpath`) so imports resolve when the project is used as a uv workspace package.
+`uv sync` installs this project in editable mode so `import pyscryfall` works. Pytest is configured in `pyproject.toml` with `testpaths = ["tests"]` and `pythonpath = ["."]`.
 
 ## References
 
