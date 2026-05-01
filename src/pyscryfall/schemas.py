@@ -16,9 +16,21 @@ except ImportError as e:
 
 # Wrap the JSON responses from the Scryfall REST API into Python dataclasses
 
+
+# Mixin class for serialization methods
+class _SerializableMixin:
+    # serialize to dictionary
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+    # serialize as json document
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict())
+
+
 # define the dataclass for the ImageUris schema
 @dataclass(slots=True)
-class ImageUris:
+class ImageUris(_SerializableMixin):
     small: str | None = None
     normal: str | None = None
     large: str | None = None
@@ -38,12 +50,13 @@ class ImageUris:
             border_crop=data.get("border_crop"),
         )
 
+
 # define the dataclass for the Prices schema
 @dataclass(slots=True)
-class Prices:
+class Prices(_SerializableMixin):
     usd: str | None = None
     usd_foil: str | None = None
-    usd_etched: str | None = None   
+    usd_etched: str | None = None
     eur: str | None = None
     eur_foil: str | None = None
     eur_etched: str | None = None
@@ -64,9 +77,10 @@ class Prices:
             tix=data.get("tix"),
         )
 
+
 # define the dataclass for the PreviewInfo schema
 @dataclass(slots=True)
-class PreviewInfo:
+class PreviewInfo(_SerializableMixin):
     previewed_at: str | None = None
     source_uri: str | None = None
     source: str | None = None
@@ -83,7 +97,7 @@ class PreviewInfo:
 
 # define the dataclass for the RelatedUris schema
 @dataclass(slots=True)
-class RelatedUris:
+class RelatedUris(_SerializableMixin):
     gatherer: str | None = None
     tcgplayer_infinite_articles: str | None = None
     tcgplayer_infinite_decks: str | None = None
@@ -97,9 +111,10 @@ class RelatedUris:
         kwargs = {f.name: data.get(f.name) for f in fields(cls)}
         return cls(**kwargs)
 
+
 # define the dataclass for the PurchaseUris schema
 @dataclass(slots=True)
-class PurchaseUris:
+class PurchaseUris(_SerializableMixin):
     tcgplayer: str | None = None
     cardmarket: str | None = None
     cardhoarder: str | None = None
@@ -117,7 +132,7 @@ class PurchaseUris:
 
 # define the dataclass for the ScryfallRelatedCard schema
 @dataclass(slots=True)
-class ScryfallRelatedCard:
+class ScryfallRelatedCard(_SerializableMixin):
     object: str
     id: str
     component: str
@@ -140,7 +155,7 @@ class ScryfallRelatedCard:
 
 # define the dataclass for the CardFace schema
 @dataclass(slots=True)
-class CardFace:
+class CardFace(_SerializableMixin):
     object: str | None = None
     name: str | None = None
     mana_cost: str | None = None
@@ -201,7 +216,7 @@ class CardFace:
 
 # define the dataclass for the ScryfallCard schema
 @dataclass(slots=True)
-class ScryfallCard:
+class ScryfallCard(_SerializableMixin):
     """
     Any Scryfall card layout.
 
@@ -335,7 +350,9 @@ class ScryfallCard:
             keywords=_str_list(data.get("keywords")),
             all_parts=_list_of(ScryfallRelatedCard, data.get("all_parts")),
             card_faces=_list_of(CardFace, data.get("card_faces")),
-            legalities=dict(data["legalities"]) if data.get("legalities") is not None else None,
+            legalities=dict(data["legalities"])
+            if data.get("legalities") is not None
+            else None,
             games=_str_list(data.get("games")),
             reserved=data.get("reserved"),
             game_changer=data.get("game_changer"),
@@ -391,15 +408,16 @@ class ScryfallCard:
             content_warning=data.get("content_warning"),
         )
 
-    # convert the ScryfallCard object to a dictionary
-    def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+    # load ScryfallCard from a serialized string
+    @classmethod
+    def loads(cls, s: str):
+        return cls.from_dict(json.loads(s))
 
 
 # define the dataclass for the ScryfallCardList schema
 # collection of ScryfallCard objects
 @dataclass(slots=True)
-class ScryfallCardList:
+class ScryfallCardList(_SerializableMixin):
     object: str
     total_cards: int
     has_more: bool
@@ -422,10 +440,6 @@ class ScryfallCardList:
     def loads(cls, s: str):
         return cls.from_dict(json.loads(s))
 
-    # convert the ScryfallCardList object to a dictionary
-    def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
-
     # convert the ScryfallCardList object to a string
     def dumps(self, **kwargs: Any) -> str:
         return json.dumps(self.to_dict(), **kwargs)
@@ -441,5 +455,5 @@ __all__ = [
     "ScryfallRelatedCard",
     "CardFace",
     "ScryfallCard",
-    "ScryfallCardList"
+    "ScryfallCardList",
 ]
