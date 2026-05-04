@@ -118,19 +118,44 @@ def test_search_card_by_id_to_dictionary():
     assert len(card.to_dict()) > 0
 
 
-# test create card object by loading a json dump
+# test create card object by loading a json string dump
 # use the dump of "Sengir Vampire" card from scryfall
-# outputs ScryfallCardlist
-def test_load_card_from_json_dump():
+# outputs ScryfallCardList
+def test_load_card_from_json_string():
     # load example card from file
     with open(JSON_DUMP, "r") as j:
-        dump_str: str = json.load(j)
+        dump_str: str = j.read()
 
     # make sure input is a string
     assert isinstance(dump_str, str)
 
+    # make sure dump_str is not empty
+    assert len(dump_str) > 0
+    # json should be valid
+    assert json.loads(dump_str) is not None
+
     # create card object
-    card = ScryfallCardList.loads(dump_str)
+    card = ScryfallCardList.from_json_string(dump_str)
+
+    # verify
+    assert isinstance(card, ScryfallCardList) and card is not None
+    assert len(card.data) > 0
+    assert card.data[0].name == "Sengir Vampire"
+
+
+# test create card object by loading a serialized dictionary
+# use the dump of "Sengir Vampire" card from scryfall
+# outputs ScryfallCardList
+def test_load_card_from_serialized_dictionary():
+    # load example card from file
+    with open(JSON_DUMP, "r") as j:
+        dump_dict: dict = json.loads(j.read())
+
+    # make sure dump_dict is a dictionary
+    assert isinstance(dump_dict, dict)
+
+    # create card object
+    card = ScryfallCardList.from_dict(dump_dict)
 
     # verify
     assert isinstance(card, ScryfallCardList) and card is not None

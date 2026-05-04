@@ -19,13 +19,18 @@ except ImportError as e:
 
 # Mixin class for serialization methods
 class _SerializableMixin:
-    # serialize to dictionary
+    # serialize the _SerializableMixin object to a dictionary
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
-    # serialize as json document
-    def to_json(self) -> str:
-        return json.dumps(self.to_dict())
+    # serialize the _SerializableMixin object as a json document
+    def to_json(self, **kwargs: Any) -> str:
+        return json.dumps(self.to_dict(), **kwargs)
+
+    # load a _SerializableMixin object from a serialized string
+    @classmethod
+    def from_json_string(cls, s: str):
+        return cls.from_dict(json.loads(s))
 
 
 # define the dataclass for the ImageUris schema
@@ -408,11 +413,6 @@ class ScryfallCard(_SerializableMixin):
             content_warning=data.get("content_warning"),
         )
 
-    # load ScryfallCard from a serialized string
-    @classmethod
-    def loads(cls, s: str):
-        return cls.from_dict(json.loads(s))
-
 
 # define the dataclass for the ScryfallCardList schema
 # collection of ScryfallCard objects
@@ -434,15 +434,6 @@ class ScryfallCardList(_SerializableMixin):
             data=[ScryfallCard.from_dict(item) for item in data["data"]],
             next_page=data.get("next_page"),
         )
-
-    # create a new ScryfallCardList object from a string
-    @classmethod
-    def loads(cls, s: str):
-        return cls.from_dict(json.loads(s))
-
-    # convert the ScryfallCardList object to a string
-    def dumps(self, **kwargs: Any) -> str:
-        return json.dumps(self.to_dict(), **kwargs)
 
 
 # export the schemas
