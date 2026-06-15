@@ -436,6 +436,74 @@ class ScryfallCardList(_SerializableMixin):
         )
 
 
+# define the dataclass for the ScryfallCatalog schema
+@dataclass(slots=True)
+class ScryfallCatalog(_SerializableMixin):
+    """
+    Catalog response from Scryfall autocomplete and other catalog endpoints.
+
+    Contains a list of string values (e.g., card names, artist names).
+    """
+    object: str
+    total_values: int
+    data: list[str]
+
+    # create a new ScryfallCatalog object from a dictionary
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]):
+        return cls(
+            object=str(data["object"]),
+            total_values=int(data["total_values"]),
+            data=[str(item) for item in data["data"]],
+        )
+
+
+# define the dataclass for the ScryfallRuling schema
+@dataclass(slots=True)
+class ScryfallRuling(_SerializableMixin):
+    """
+    A single ruling or clarification about a Magic card.
+
+    Rulings come from Gatherer or other official sources.
+    """
+    object: str
+    oracle_id: str
+    source: str
+    published_at: str
+    comment: str
+
+    # create a new ScryfallRuling object from a dictionary
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]):
+        return cls(
+            object=str(data["object"]),
+            oracle_id=str(data["oracle_id"]),
+            source=str(data["source"]),
+            published_at=str(data["published_at"]),
+            comment=str(data["comment"]),
+        )
+
+
+# define the dataclass for the ScryfallRulingList schema
+@dataclass(slots=True)
+class ScryfallRulingList(_SerializableMixin):
+    """
+    List of rulings for a card.
+    """
+    object: str
+    has_more: bool
+    data: list[ScryfallRuling]
+
+    # create a new ScryfallRulingList object from a dictionary
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]):
+        return cls(
+            object=str(data["object"]),
+            has_more=bool(data["has_more"]),
+            data=[ScryfallRuling.from_dict(item) for item in data["data"]],
+        )
+
+
 # export the schemas
 __all__ = [
     "ImageUris",
@@ -447,4 +515,7 @@ __all__ = [
     "CardFace",
     "ScryfallCard",
     "ScryfallCardList",
+    "ScryfallCatalog",
+    "ScryfallRuling",
+    "ScryfallRulingList",
 ]
