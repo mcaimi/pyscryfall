@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pyscryfall"
-version = "0.1.2"
+version = "0.2.0"
 description = "Python library to search Magic The Gathering cards information on scryfall.com"
 readme = "README.md"
 requires-python = ">=3.12"
