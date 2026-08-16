@@ -365,5 +365,6 @@ uv run pytest -v
 
 ## AI Disclosure
 
-Part of this project has been developed with the help of an AI Model.
+This is *not* a vibe-coded project, but parts of this project has been developed with the help of an AI Model. Specifically, I am working with a locally-hosted [Qwen-3.6-35B-A3B-GGUF](https://huggingface.co/unsloth/Qwen3.5-35B-A3B-GGUF) via llama.cpp on my M1 Pro Macbook Pro
 
+AI has been helpful during the initial implementation phases and to basically write all API schemas.
